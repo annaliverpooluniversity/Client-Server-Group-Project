@@ -5,7 +5,6 @@ Members of the group should provide a code review to each other's code. The team
 2.	Software Architect: designs the solution
 3.	Software Engineer: writes the code
 4.	Tester: tests the code
-
 You will need to submit your code and a report of between 1000 and 1500 words. Your code submission should include your directory tree as well as code documentation. This should include as a minimum a Readme.md and requirements.txt as well as other documentation that you may see fit to include. In addition, the log of Github/GitLab push comments and code reviews should be included.
 Be sure that all contents are easily accessible. If you use an online service (i.e. GitLab), make sure settings allow anyone with the direct link to access the repo, even after receiving your grade. 
 NOTE: Working in Groups – Basic Expectations
