@@ -30,6 +30,7 @@ client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 HOST = socket.gethostname()
 PORT = 65444
 
+#This is a comment to check how GITHUB works 
 
 # Initializing dictionary names
 dict_from_csv = {} 
