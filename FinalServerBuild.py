@@ -1,4 +1,3 @@
-"""
 # Import library for building a TCP server-client
 import socket
 # Import library to work with directories and files
@@ -32,10 +31,47 @@ while True:
     clientsocket,addr = server_socket.accept()    
     print("Client Connected")
    
+   
+    
+# function to close the client connection, server and server GUI window.    
+    def close_window(event):
+        clientsocket.close()
+        server_socket.close()        
+        window.destroy()
+    
 
-    server_socket.close()        
 
 
+# Function to decrypt an encrypted file. 
+    def decrypt_file(event):
+
+
+# Opening a dialog box to enter the key for decryption.        
+        keyfilename = filedialog.askopenfilename(
+            initialdir ="C:/Users/Desktop/Server/",
+            title = "Open File with Encryption Key",
+            )
+        keyfilesize = os.path.getsize(keyfilename)      
+        key = open(keyfilename,'rb').read()
+        f = Fernet(key)
+
+# Opening a dialog box to select the file to be decrypted.         
+        filename = filedialog.askopenfilename(
+            initialdir ="C:/Users/Desktop/Server/",
+            title = "Open File to Decrypt",
+            )
+        filesize = os.path.getsize(filename)   
+                      
+        with open(filename,"rb") as file:
+            # read the encrypted data
+            encrypted_data = file.read()
+            
+        # Decrypt data
+        decrypted_data = f.decrypt(encrypted_data)
+        
+        # Write to the original file
+        with open(filename, "wb") as file:
+            file.write(decrypted_data)
 
 
 
@@ -115,17 +151,38 @@ while True:
 # Creating a button with binding that closes the client connection, server and window       
     btn_allcloser = tk.Button(master=window,text = "Close Server and Window")
     btn_allcloser.grid(row=0,column=3,sticky="nsew",padx=5,pady=5)
-
+    btn_allcloser.bind("<Button-1>",close_window)
 
 
 # Creating a button with binding that decrypts a selected text file    
     btn_decrypt = tk.Button(master=window,text = "Decrypt Text File")
     btn_decrypt.grid(row=0,column=2,sticky="nsew",padx=5,pady=5)
-
+    btn_decrypt.bind("<Button-1>",decrypt_file)
     
 
 # Opening up the main server window.      
     window.mainloop()    
+ 
+    
+   
+# Should the client send a file, the server is ready to receive  
+    received = clientsocket.recv(4096).decode()
+
+# Server receives filename and filesize.    
+    filename,filesize = received.split("<SEPARATOR>")
+# Removing the path to the file and storing the name 
+    filename=os.path.basename(filename)
+    
+# Storing file size, could be used for tracking trasnfer progress    
+    filesize = int(filesize)
+
+# Reading and writing the contects from the client into a file. 
+    with open(filename,"wb") as f:
+        bytes_read = clientsocket.recv(4096)
+        if not bytes_read:
+            break
+        f.write(bytes_read)
+   
 
     break
 

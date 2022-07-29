@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Jul 23 14:52:21 2022
-
-@author: Anna
-"""
-
 # Import library for building a TCP server-client
 import socket
 # Import library to work with directories and files
