@@ -24,10 +24,6 @@ HOST = socket.gethostname()
 PORT = 65444
 
 
-# Initializing dictionary names
-dict_from_csv = {} 
-binary_dict = {}
-
 
 # Define a function that will connect to the server. 
 def connect_to_server(event):
@@ -135,29 +131,38 @@ def dictionary_creation(event):
    tf = filedialog.askopenfilename(
        initialdir="C:/Users/Desktop/", 
        title="Open CSV file", 
-       filetypes=(("Text Files", "*.*"),)
+       filetypes=(("Text Files", "*.csv"),)
        )
 
-
+#assign dict_from_csv as a global variable to make available in other functions
+   global dict_from_csv
 # Here we are transfer the contents of the CSV file into a Python dictionary.   
    with open(tf,'r') as inputfile:   
         reader = csv.reader(inputfile)
         dict_from_csv = {rows[0]:rows[1] for rows in reader}
+       
 
 # Function to serialize dictionary with Binary format.
 # We write this dictionary into a local client 'write_file'
 def dict_to_binary(event):
-    with open ("data_file_as_Binary.txt","w") as write_file:
+    with open ("data_file_as_Binary.txt","wb") as write_file:
         pickle.dump(dict_from_csv,write_file)
+
+    with open ("data_file_as_Binary.txt","rb") as read_file:
+        print(pickle.load(read_file))
+        
 
 # Function to serialize dictionary with JSON format.
 # We write this dictionary into a local client 'write_file'
    
 def dict_to_json(event):
+    
+    print(dict_from_csv)
+    
     with open("data_file_json.json","w") as write_file:
         json.dump(dict_from_csv,write_file)
 
-
+    
 # We are creating a GUI to access our client called 'Client Interface'
 window = tk.Tk()
 window.title("Client Interface")
