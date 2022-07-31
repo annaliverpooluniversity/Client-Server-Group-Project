@@ -53,18 +53,15 @@ def unencrypted_send(event):
 
 # Here we are copying the contents of the file
 # Split into smaller pieces that will be transferred to the server.
-    with open(filename,'rb') as f:
-        while True:
-            bytes_read = f.read(4096)
-            if not bytes_read:
-                break
-
+    f=open(filename,'rb')
+    l=f.read(4096)
+    while(l):
+        client_socket.sendall(l)
+        l=f.read(4096)
+    f.close()
+    client_socket.close()
 # Finally, we use the client connection to the server to send the file. 
-            client_socket.sendall(bytes_read)
             
-  
-        
-
 
 # Here we define a function that generates a key and writes it to a file
 def write_key(event):
