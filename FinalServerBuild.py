@@ -18,153 +18,27 @@ server_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 HOST = socket.gethostname()
 PORT = 65444
 
-# Creating a server with assigned Host and Port
-server_socket.bind((HOST,PORT))
-print("Server Socket Created")
 
-# Listening for connections. We limit the number of concurrent connections to 1.
-server_socket.listen(1)
-  
-while True:
+
+def openre_server(event):
+    # Creating a server with assigned Host and Port
+    server_socket.bind((HOST,PORT))
+    print("Server Socket Created")
+
+    # Listening for connections. We limit the number of concurrent connections to 1.
+    server_socket.listen(1)
+    # Accepting a client connection to the server and confirming the same. 
     
-# Accepting a client connection to the server and confirming the same. 
-    clientsocket,addr = server_socket.accept()    
+    #declaring the connection to client as global to access in other functions.
+    global clientsocket
+    global addr
+    
+    clientsocket,addr = server_socket.accept()   
     print("Client Connected")
-   
-   
+
+
+def receive_files(event):
     
-# function to close the client connection, server and server GUI window.    
-    def close_window(event):
-        clientsocket.close()
-        server_socket.close()        
-        window.destroy()
-    
-
-
-
-# Function to decrypt an encrypted file. 
-    def decrypt_file(event):
-
-
-# Opening a dialog box to enter the key for decryption.        
-        keyfilename = filedialog.askopenfilename(
-            initialdir ="C:/Users/Desktop/Server/",
-            title = "Open File with Encryption Key",
-            )
-        keyfilesize = os.path.getsize(keyfilename)      
-        key = open(keyfilename,'rb').read()
-        f = Fernet(key)
-
-# Opening a dialog box to select the file to be decrypted.         
-        filename = filedialog.askopenfilename(
-            initialdir ="C:/Users/Desktop/Server/",
-            title = "Open File to Decrypt",
-            )
-        filesize = os.path.getsize(filename)   
-                      
-        with open(filename,"rb") as file:
-            # read the encrypted data
-            encrypted_data = file.read()
-            
-        # Decrypt data
-        decrypted_data = f.decrypt(encrypted_data)
-        
-        # Write to the original file
-        with open(filename, "wb") as file:
-            file.write(decrypted_data)
-
-
-
-# Define function to print contents of received file to 'Text Output File'             
-    def print_to_file(event):
-
-# Dialog to select the file that needs to be printed to the text output file. 
-        filename = filedialog.askopenfilename(
-            initialdir ="C:/Users/Desktop/Server/",
-            title = "Open File to Print to File",
-            )
-        filesize = os.path.getsize(filename)   
-
-# Here the contents of the selected file are printed to the text output file.         
-        with open(filename,"r",encoding='utf-8') as infile:
-            with open("TextOutPutFile.txt",'a',encoding='utf-8') as outfile: 
-                for line in infile:
-                    outfile.write(line)
-                    
-# Function to display the contents of the selected file to the screen                 
-    def print_to_screen(event):
-
-# A function to open a dialog to select a file and make the contents available
-        def openFile():           
-            tf = filedialog.askopenfilename(
-                initialdir="C:/Users/Desktop/Server/", 
-                title="Open file to display", 
-                filetypes=(("Text Files", "*.*"),)
-                )
-            pathh.insert(END, tf)
-            tf = open(tf,'r',encoding = 'utf-8')
-            data = tf.read()
-            txtarea.insert(END, data)
-            tf.close()
-
-# Open a window that will be used to dispay the contents of a selected file
-        ws = tk.Tk()
-        ws.title("File Contents")
-        ws.geometry("650x650")
-        ws['bg']='black'
-
-# Adding a text area to the window to display the contents of the file
-        txtarea = Text(ws, width=65, height=25)
-        txtarea.pack(pady=20)
-
-# Adding a box that will display the selected file path
-        pathh = Entry(ws)
-        pathh.pack(side=LEFT, expand=True, fill=X, padx=20)
-
-# Adding a button that calls the openFile function to select a file to display
-        Button(
-            ws, 
-            text="Open File", 
-            command=openFile
-            ).pack(side=RIGHT, expand=True, fill=X, padx=20)
-# Opening the windown for file selection and display
-        ws.mainloop()
-
-# Opening the main server window that will be used as an interface
-    window = tk.Tk()
-    window.title("Server Interface")
-
-# Server interface will have four buttons 
-    window.rowconfigure([0], minsize=50,weight = 1)
-    window.columnconfigure([0,1,2,3],minsize=50,weight = 1)
-
-# Creating a button with binding that prints the contents of a file to the screen
-    btn_scprnt = tk.Button(master=window,text="Print Contents to Screen")
-    btn_scprnt.grid(row=0, column=0, sticky = "nsew",padx=5,pady=5)
-    btn_scprnt.bind("<Button-1>",print_to_screen)
-
-# Creating a button with binding that prints the contents of a file to the text output file
-    btn_fprnt = tk.Button(master=window,text="Print Contents to File")
-    btn_fprnt.grid(row=0,column=1,sticky ="nsew",padx=5,pady=5)
-    btn_fprnt.bind("<Button-1>",print_to_file)
-
-# Creating a button with binding that closes the client connection, server and window       
-    btn_allcloser = tk.Button(master=window,text = "Close Server and Window")
-    btn_allcloser.grid(row=0,column=3,sticky="nsew",padx=5,pady=5)
-    btn_allcloser.bind("<Button-1>",close_window)
-
-
-# Creating a button with binding that decrypts a selected text file    
-    btn_decrypt = tk.Button(master=window,text = "Decrypt Text File")
-    btn_decrypt.grid(row=0,column=2,sticky="nsew",padx=5,pady=5)
-    btn_decrypt.bind("<Button-1>",decrypt_file)
-    
-
-# Opening up the main server window.      
-    window.mainloop()    
- 
-    
-   
 # Should the client send a file, the server is ready to receive  
     received = clientsocket.recv(4096).decode()
 
@@ -176,18 +50,166 @@ while True:
 # Storing file size, could be used for tracking trasnfer progress    
     filesize = int(filesize)
 
+
 # Reading and writing the contects from the client into a file. 
     with open(filename,"wb") as f:
-        bytes_read = clientsocket.recv(4096)
-        if not bytes_read:
-            break
-        f.write(bytes_read)
+        print("File opened")
+        while True:
+            bytes_read = clientsocket.recv(4096)
+            if not bytes_read:
+                break
+            f.write(bytes_read)
+    f.close()
+
+    
+    
+# function to close the client connection, server and server GUI window.    
+def close_window(event):
+    clientsocket.close()
+    server_socket.close()        
+    window.destroy()
+
+
+
+
+# Function to decrypt an encrypted file. 
+def decrypt_file(event):
+
+
+# Opening a dialog box to enter the key for decryption.        
+    keyfilename = filedialog.askopenfilename(
+        initialdir ="C:/Users/Desktop/Server/",
+        title = "Open File with Encryption Key",
+        )
+    keyfilesize = os.path.getsize(keyfilename)      
+    key = open(keyfilename,'rb').read()
+    f = Fernet(key)
+
+# Opening a dialog box to select the file to be decrypted.         
+    filename = filedialog.askopenfilename(
+        initialdir ="C:/Users/Desktop/Server/",
+        title = "Open File to Decrypt",
+        )
+    filesize = os.path.getsize(filename)   
+                  
+    with open(filename,"rb") as file:
+        # read the encrypted data
+        encrypted_data = file.read()
+        
+    # Decrypt data
+    decrypted_data = f.decrypt(encrypted_data)
+    
+    # Write to the original file
+    with open(filename, "wb") as file:
+        file.write(decrypted_data)
+
+
+
+# Define function to print contents of received file to 'Text Output File'             
+def print_to_file(event):
+
+# Dialog to select the file that needs to be printed to the text output file. 
+    filename = filedialog.askopenfilename(
+        initialdir ="C:/Users/Desktop/Server/",
+        title = "Open File to Print to File",
+        )
+    filesize = os.path.getsize(filename)   
+
+# Here the contents of the selected file are printed to the text output file.         
+    with open(filename,"r",encoding='utf-8') as infile:
+        with open("TextOutPutFile.txt",'a',encoding='utf-8') as outfile: 
+            for line in infile:
+                outfile.write(line)
+                
+# Function to display the contents of the selected file to the screen                 
+def print_to_screen(event):
+
+# A function to open a dialog to select a file and make the contents available
+    def openFile():           
+        tf = filedialog.askopenfilename(
+            initialdir="C:/Users/Desktop/Server/", 
+            title="Open file to display", 
+            filetypes=(("Text Files", "*.txt"),)
+            )
+        pathh.insert(END, tf)
+        tf = open(tf,'r',encoding = 'utf-8')
+        data = tf.read()
+        txtarea.insert(END, data)
+        tf.close()
+
+# Open a window that will be used to dispay the contents of a selected file
+    ws = tk.Tk()
+    ws.title("File Contents")
+    ws.geometry("650x650")
+    ws['bg']='black'
+
+# Adding a text area to the window to display the contents of the file
+    txtarea = Text(ws, width=65, height=25)
+    txtarea.pack(pady=20)
+
+# Adding a box that will display the selected file path
+    pathh = Entry(ws)
+    pathh.pack(side=LEFT, expand=True, fill=X, padx=20)
+
+# Adding a button that calls the openFile function to select a file to display
+    Button(
+        ws, 
+        text="Open File", 
+        command=openFile
+        ).pack(side=RIGHT, expand=True, fill=X, padx=20)
+# Opening the windown for file selection and display
+    ws.mainloop()
+
+# Opening the main server window that will be used as an interface
+window = tk.Tk()
+window.title("Server Interface")
+
+# Server interface will have four buttons 
+window.rowconfigure([0], minsize=50,weight = 1)
+window.columnconfigure([0,1,2,3,4,5],minsize=50,weight = 1)
+
+# Creating a button with binding that prints the contents of a file to the screen
+btn_opnser = tk.Button(master=window,text="Open Server")
+btn_opnser.grid(row=0, column=0, sticky = "nsew",padx=5,pady=5)
+btn_opnser.bind("<Button-1>",openre_server)
+
+
+# Creating a button with binding that prints the contents of a file to the screen
+btn_recfile = tk.Button(master=window,text="Click to receive file")
+btn_recfile.grid(row=0, column=1, sticky = "nsew",padx=5,pady=5)
+btn_recfile.bind("<Button-1>",receive_files)
+
+# Creating a button with binding that prints the contents of a file to the screen
+btn_scprnt = tk.Button(master=window,text="Print Contents to Screen")
+btn_scprnt.grid(row=0, column=2, sticky = "nsew",padx=5,pady=5)
+btn_scprnt.bind("<Button-1>",print_to_screen)
+
+# Creating a button with binding that prints the contents of a file to the text output file
+btn_fprnt = tk.Button(master=window,text="Print Contents to File")
+btn_fprnt.grid(row=0,column=3,sticky ="nsew",padx=5,pady=5)
+btn_fprnt.bind("<Button-1>",print_to_file)
+
+# Creating a button with binding that decrypts a selected text file    
+btn_decrypt = tk.Button(master=window,text = "Decrypt Text File")
+btn_decrypt.grid(row=0,column=4,sticky="nsew",padx=5,pady=5)
+btn_decrypt.bind("<Button-1>",decrypt_file)
+
+# Creating a button with binding that closes the client connection, server and window       
+btn_allcloser = tk.Button(master=window,text = "Close Server and Window")
+btn_allcloser.grid(row=0,column=5,sticky="nsew",padx=5,pady=5)
+btn_allcloser.bind("<Button-1>",close_window)
+
+
+
+# Opening up the main server window.      
+window.mainloop()    
+
    
 
-    break
 
-    
-    
+
+
+
 
 
 
