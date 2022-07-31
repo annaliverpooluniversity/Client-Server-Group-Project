@@ -1,0 +1,11 @@
+Most library are standard python libraries requiring no manual installation except library cryptography and  dicttoxml.
+
+- cryptography
+	For the cryptography library, please run >> pip install cryptography
+
+-dicttoxml 
+	To install this package with conda run one of the following:
+	conda install -c conda-forge dicttoxml
+	conda install -c conda-forge/label/cf201901 dicttoxml
+	conda install -c conda-forge/label/cf202003 dicttoxml
+
