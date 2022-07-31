@@ -14,6 +14,13 @@ import csv
 import json
 # Import library to serialize with Binary format
 import pickle
+# Import library to serialize to XML 
+from dicttoxml import dicttoxml
+# Import library to write xml serialized data to xml file
+from xml.dom.minidom import parseString
+
+
+# Initializing dictionary names
 
 
 # Creating a socket that will connect to the server.
@@ -22,7 +29,6 @@ client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Here we define the host as the local host and a random port.
 HOST = socket.gethostname()
 PORT = 65444
-
 
 
 # Define a function that will connect to the server. 
@@ -148,8 +154,8 @@ def dict_to_binary(event):
     with open ("data_file_as_Binary.txt","wb") as write_file:
         pickle.dump(dict_from_csv,write_file)
 
-    with open ("data_file_as_Binary.txt","rb") as read_file:
-        print(pickle.load(read_file))
+#    with open ("data_file_as_Binary.txt","rb") as read_file:
+#        print(pickle.load(read_file))
         
 
 # Function to serialize dictionary with JSON format.
@@ -157,10 +163,18 @@ def dict_to_binary(event):
    
 def dict_to_json(event):
     
-    print(dict_from_csv)
+#    print(dict_from_csv)
     
     with open("data_file_json.json","w") as write_file:
         json.dump(dict_from_csv,write_file)
+
+# Functions to serialize dictionary to XML format
+def dict_to_xml(event):
+    xml_data = dicttoxml(dict_from_csv)
+    xml_decode = xml_data.decode()
+    
+    with open("data_file_xml.xml", "w") as write_file: #creating a file with xml extension that can be written
+        write_file.write(xml_decode)
 
     
 # We are creating a GUI to access our client called 'Client Interface'
@@ -199,6 +213,7 @@ btn_dictjson.bind("<Button-1>",dict_to_json)
 # Creating a button with binding to serialize a dictionary in XML format.
 btn_dictxml = tk.Button(master=window, text="Serialize Dictionary to XML")
 btn_dictxml.grid(row=1,column=2,sticky = "nsew",padx=5,pady=5)
+btn_dictxml.bind("<Button-1>",dict_to_xml)
 
 # Creating a button with binding to generate an encryption key. 
 btn_sendenc = tk.Button(master=window,text="Generate Encryption Key")
