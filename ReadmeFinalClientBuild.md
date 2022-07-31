@@ -55,7 +55,7 @@ Generate Encryption Key
 Send File (Encrypted)
 ------------------------------------------------------------------------------------------------------------------------------
 - Remember to click on the button 'Click to receive file' on the Server GUI before trying to send a file. 
-- This button opens a dialog that allows the user to select the file that is then encrypted and sent to the server. 
+- This button opens a dialog that allows the user to select the file that is then encrypted with the key generated with 'Generate Encryption Key' function and sent to the server. 
 
 ------------------------------------------------------------------------------------------------------------------------------
 Close Client
