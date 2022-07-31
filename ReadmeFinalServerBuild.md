@@ -2,8 +2,9 @@
 Readme file for the Group Project
 ------------------------------------------------------------------------------------------------------------------------------
 - Store 'FinalServerBuild.py' and 'FinalClientBuild.py' in separate folders. This will mimic the client and server being on two separate machines. 
-- Start by calling 'python FinalServerBuild.py' from terminal/command prompt.
-- The terminal should print "Server Socket Created"; confirming that the server is created and listening for the client connection. 
+- Start by calling 'python FinalServerBuild.py' from terminal/command prompt. Depending on permissions, you might need to run CMD as administrator.
+- This should open a GUI Window called 'Server Interface' with five buttons. 
+- From the 'Server Interface' click on the first button from the left 'Open Server'. This will open a socket and listen for connections from the client. 
 - From a separate terminal/command prompt call 'python FinalClientBuild.py'. This should open up a GUI Window called 'Client Interface' with nine buttons. 
 - Click on connect to server. 
 - The server terminal/command prompt should print "Client Connected" once there is a succesful connection between the client and the server. 
@@ -14,6 +15,12 @@ Server GUI Interface only opens after a succesful connection has been made from 
 ------------------------------------------------------------------------------------------------------------------------------
 - Watch out! The server GUI Window might open behind the Client GUI window. 
 - The server GUI window has four buttons that help interact with data stored on the client. 
+
+------------------------------------------------------------------------------------------------------------------------------
+Click to receive file
+------------------------------------------------------------------------------------------------------------------------------
+- If you would like to receive a file from the client to the server. 
+- Remember to click this button before trying to send files from the client to the server. 
 
 ------------------------------------------------------------------------------------------------------------------------------
 Print Contents to Screen
