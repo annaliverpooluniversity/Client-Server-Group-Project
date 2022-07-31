@@ -18,6 +18,7 @@ import pickle
 from dicttoxml import dicttoxml
 # Import library to write xml serialized data to xml file
 from xml.dom.minidom import parseString
+import unittest
 
 
 # Initializing dictionary names
@@ -33,7 +34,11 @@ PORT = 65444
 
 # Define a function that will connect to the server. 
 def connect_to_server(event):
-    client_socket.connect((HOST,PORT))
+    try:
+        client_socket.connect((HOST,PORT))
+        return True
+    except:
+        return False
     
 
 # Define a function that will send a selected file to the server unencypted.
@@ -172,8 +177,90 @@ def dict_to_xml(event):
     
     with open("data_file_xml.xml", "w") as write_file: #creating a file with xml extension that can be written
         write_file.write(xml_decode)
+        
 
+class UnitTesting(unittest.TestCase):
     
+    def test1_connection(self):
+        print("Testing if connection works...")
+        connection = connect_to_server('test')
+        self.assertTrue(connection, "There is no connection!")
+        print("Connection test passed!")
+        
+    def test2_encryption(self):
+        print("Testing if encryption works...")
+        filename = filedialog.askopenfilename(
+            initialdir ="C:/Users/Desktop/",
+            title = "Open File to Transfer",
+            )
+        
+    # Getting the filesize. Useful if we should want to create progress bars.      
+        filesize = os.path.getsize(filename)
+        
+    # Loading the key with which to encrypt the file.         
+        f = Fernet(load_key())
+        
+        with open(filename,"rb") as file:
+            # Read all the file data
+            file_data = file.read()
+            # Encrypt data
+            encrypted_data = f.encrypt(file_data)
+            self.assertNotEqual(file_data, encrypted_data, "Encryption not working!")
+        print("Encryption test passed!")
+        
+    
+    def test3_json_serialization(self):
+        print("Testing if json serialization works...")
+        with open("UnitTestData.csv",'r') as inputfile:   
+             reader = csv.reader(inputfile)
+             dict_from_csv = {rows[0]:rows[1] for rows in reader}
+             known_outcome = '''{
+                 "\u00ef\u00bb\u00bfOrder ID\": \"Customer Name\",
+                 "CA-2016-152156\": \"Claire Gute\",
+                 "US-2015-108966\": \"Sean O'Donnell\",
+                 "CA-2016-138688\": \"Darrin Van Huff\"
+             }'''
+             self.assertEqual(json.loads(known_outcome), json.loads(json.dumps(dict_from_csv, indent=4)))
+        print("json serialization test passed!")
+
+
+    def test4_xml_serialization(self):
+        print("Testing if XML serialization works...")
+        with open("UnitTestData.csv",'r') as inputfile:   
+             reader = csv.reader(inputfile)
+             dict_from_csv = {rows[0]:rows[1] for rows in reader}
+             xml_data = dicttoxml(dict_from_csv)
+             xml_decode = xml_data.decode()
+             known_outcome = '<?xml version="1.0" encoding="UTF-8" ?><root><key name="Order ID" type="str">Customer Name</key><CA-2016-152156 type="str">Claire Gute</CA-2016-152156><US-2015-108966 type="str">Sean O&apos;Donnell</US-2015-108966><CA-2016-138688 type="str">Darrin Van Huff</CA-2016-138688></root>' 
+             self.assertEqual(known_outcome, xml_decode.encode('ascii', 'ignore').decode())
+        print("XML serialization test passed!")
+        
+        
+    def test5_binary_serialization(self):
+        print("Testing if binary serialization works...")
+        with open("UnitTestData.csv",'r') as inputfile:   
+             reader = csv.reader(inputfile)
+             dict_from_csv = {rows[0]:rows[1] for rows in reader}
+             known_outcome = b"\x80\x04\x95\x8a\x00\x00\x00\x00\x00\x00\x00}\x94(\x8c\x0e\xc3\xaf\xc2\xbb\xc2\xbfOrder ID\x94\x8c\rCustomer Name\x94\x8c\x0eCA-2016-152156\x94\x8c\x0bClaire Gute\x94\x8c\x0eUS-2015-108966\x94\x8c\x0eSean O'Donnell\x94\x8c\x0eCA-2016-138688\x94\x8c\x0fDarrin Van Huff\x94u."
+             self.assertEqual(known_outcome, pickle.dumps(dict_from_csv))
+        print("binary serialization test passed!")
+        
+    def test6_connection_closing(self):
+        print("Testing if connection closes...")
+        try:
+            client_socket.close()
+            connection = True
+        except:
+            connection = False
+        self.assertTrue(connection, "The connection closing did not work!")
+        print("Connection closing test passed!")
+
+
+if __name__ == '__main__':
+    unittest.main()
+
+
+
 # We are creating a GUI to access our client called 'Client Interface'
 window = tk.Tk()
 window.title("Client Interface")
