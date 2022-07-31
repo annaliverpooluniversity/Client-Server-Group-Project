@@ -2,8 +2,9 @@
 Readme file for the Group Project
 ------------------------------------------------------------------------------------------------------------------------------
 - Store 'FinalServerBuild.py' and 'FinalClientBuild.py' in separate folders. This will mimic the client and server being on two separate machines. 
-- Start by calling 'python FinalServerBuild.py' from terminal/command prompt.
-- The terminal should print "Server Socket Created"; confirming that the server is created and listening for the client connection. 
+- Start by calling 'python FinalServerBuild.py' from terminal/command prompt. Depending on permissions, you might need to run CMD as administrator.
+- This should open a GUI Window called 'Server Interface' with five buttons. 
+- From the 'Server Interface' click on the first button from the left 'Open Server'. This will open a socket and listen for connections from the client. 
 - From a separate terminal/command prompt call 'python FinalClientBuild.py'. This should open up a GUI Window called 'Client Interface' with nine buttons. 
 - Click on connect to server. 
 - The server terminal/command prompt should print "Client Connected" once there is a succesful connection between the client and the server. 
@@ -12,6 +13,7 @@ Readme file for the Group Project
 ------------------------------------------------------------------------------------------------------------------------------
 Send file (unencrypted)
 ------------------------------------------------------------------------------------------------------------------------------
+- Remember to click on the button 'Click to receive file' on the Server GUI before trying to send a file. 
 - click on the button - 'Send File (Unencrypted)'
 - Dialog box opens up; select the file that you want to transfer from Client to Server without encryption.
 - Once you select the file and the server successfully receives it, another GUI Window opens up called 'Server Interface' with four buttons. 
@@ -52,6 +54,7 @@ Generate Encryption Key
 ------------------------------------------------------------------------------------------------------------------------------
 Send File (Encrypted)
 ------------------------------------------------------------------------------------------------------------------------------
+- Remember to click on the button 'Click to receive file' on the Server GUI before trying to send a file. 
 - This button opens a dialog that allows the user to select the file that is then encrypted and sent to the server. 
 
 ------------------------------------------------------------------------------------------------------------------------------
