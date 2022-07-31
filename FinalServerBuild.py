@@ -8,6 +8,10 @@ from tkinter import *
 from tkinter import filedialog
 # Import library for encryption and decryption of files. 
 from cryptography.fernet import Fernet 
+import unittest
+from os.path import exists
+
+
 
 
 # Creating a socket that will create a server and help connect to the client.
@@ -42,12 +46,12 @@ def receive_files(event):
 # Should the client send a file, the server is ready to receive  
     received = clientsocket.recv(4096).decode()
 
-# Server receives filename and filesize.    
+# Server receives filename and filesize.
     filename,filesize = received.split("<SEPARATOR>")
 # Removing the path to the file and storing the name 
     filename=os.path.basename(filename)
     
-# Storing file size, could be used for tracking trasnfer progress    
+# Storing file size, could be used for tracking trasnfer progress
     filesize = int(filesize)
 
 
@@ -58,7 +62,10 @@ def receive_files(event):
             bytes_read = clientsocket.recv(4096)
             if not bytes_read:
                 break
-            f.write(bytes_read)
+            try:
+                f.write(bytes_read)
+            except Exception as e: #e is the error message that could occur in the try block
+                print(e)
     f.close()
 
     
@@ -101,8 +108,10 @@ def decrypt_file(event):
     
     # Write to the original file
     with open(filename, "wb") as file:
-        file.write(decrypted_data)
-
+        try:
+            file.write(decrypted_data)
+        except Exception as e: #e is the error message that could occur in the try block
+            print(e)
 
 
 # Define function to print contents of received file to 'Text Output File'             
@@ -119,7 +128,11 @@ def print_to_file(event):
     with open(filename,"r",encoding='utf-8') as infile:
         with open("TextOutPutFile.txt",'a',encoding='utf-8') as outfile: 
             for line in infile:
-                outfile.write(line)
+                try:
+                    outfile.write(line)
+                except Exception as e: #e is the error message that could occur in the try block
+                    print(e)
+
                 
 # Function to display the contents of the selected file to the screen                 
 def print_to_screen(event):
@@ -159,6 +172,62 @@ def print_to_screen(event):
         ).pack(side=RIGHT, expand=True, fill=X, padx=20)
 # Opening the windown for file selection and display
     ws.mainloop()
+
+
+class UnitTesting(unittest.TestCase):
+    
+    
+    def test1_server_startup(self):
+        print("Testing server starts up...")
+        try:
+            test_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+            test_socket.bind((HOST,PORT))
+            connection = True
+        except:
+            connection = False
+        self.assertTrue(connection, "Server did not start up!")
+        print("Server starts up test passed!")
+    
+
+    def test2_decryption(self):
+        print("Testing if decryption works...")
+        # Opening a dialog box to enter the key for decryption.        
+        keyfilename = filedialog.askopenfilename(
+            initialdir ="C:/Users/Desktop/Server/",
+            title = "Open File with Encryption Key",
+            )     
+        key = open(keyfilename,'rb').read()
+        f = Fernet(key)
+   
+        filename = "Encrypted_UnitTestData.csv"  
+                      
+        with open(filename,"rb") as file:
+            # read the encrypted data
+            file_data = file.read()
+            
+        # Decrypt data
+        decrypted_data = f.decrypt(file_data)
+        
+        # Write to the original file
+        with open(filename, "wb") as file:
+            try:
+                file.write(decrypted_data)
+            except Exception as e: #e is the error message that could occur in the try block
+                print(e)
+        self.assertNotEqual(file_data, decrypted_data, "Decryption not working!")
+        print("Decryption test passed!")
+
+
+    def test3_output_to_file(self):
+        print("Testing if output file exists...")
+        print_to_file('test')
+        self.assertTrue(exists("TextOutPutFile.txt"), "Output file does not exist!")
+        print("Output file test passed!")
+
+
+if __name__ == '__main__':
+    unittest.main()
+
 
 # Opening the main server window that will be used as an interface
 window = tk.Tk()
@@ -203,13 +272,3 @@ btn_allcloser.bind("<Button-1>",close_window)
 
 # Opening up the main server window.      
 window.mainloop()    
-
-   
-
-
-
-
-
-
-
-
