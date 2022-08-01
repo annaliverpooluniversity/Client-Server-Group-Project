@@ -1,37 +1,44 @@
-# Import library for building a TCP server-client
-import socket
-# Import library to work with directories and files
-import os
-# Import libraries to build GUI 
-import tkinter as tk
-from tkinter import *
-from tkinter import filedialog
-# Import library for encryption and decryption of files. 
-from cryptography.fernet import Fernet
-# Import library for reading CSV files to build a dictionary.
-import csv
-# Import library to serialize into JSON format
-import json
-# Import library to serialize with Binary format
-import pickle
-# Import library to serialize to XML 
-from dicttoxml import dicttoxml
-# Import library to write xml serialized data to xml file
-from xml.dom.minidom import parseString
-import unittest
+"""
+The following libraries have comments besides them that explains why they are imported.
+"""
 
-# Initializing dictionary names
+import socket  # Import library for building a TCP server-client
 
+import os  # Import library to work with directories and files
 
-# Creating a socket that will connect to the server.
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# Sockets needs a host and port to connect to the server.
-# Here we define the host as the local host and a random port.
+import tkinter as tk  # Import library to build GUI
+
+from tkinter import *  # Import library to build GUI
+
+from tkinter import filedialog  # Import library to build GUI
+
+from cryptography.fernet import Fernet  # Import library for encryption and decryption of files.
+
+import csv  # Import library for reading CSV files which is the input file to build a dictionary.
+
+import json  # Import library to serialize into JSON format
+
+import pickle  # Import library to serialize with Binary format
+
+from dicttoxml import dicttoxml  # Import library to serialize to XML
+
+from xml.dom.minidom import parseString  # Import library to write xml serialized data to xml file.
+
+import unittest  # Import library to run unit test for parts of the code.
+
+""" 
+A socket with a defined host and port is created to make a connection with the server. The host is defined as the 
+local host and the port is given a port number of 65444 so it is a private port. A function is then defined to connect 
+the client socket to the host and port. It is crucial for this connection to happen. Therefore exception handling is 
+used to check whether the connection is made or not.
+"""
+
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Creating a socket that will connect to the server.
 HOST = socket.gethostname()
 PORT = 65444
 
 
-# Define a function that will connect to the server. 
+# Define a function that will connect to the server.
 def connect_to_server(event):
     try:
         client_socket.connect((HOST, PORT))
@@ -40,22 +47,28 @@ def connect_to_server(event):
         return False
 
 
-# Define a function that will send a selected file to the server unencypted.
+"""
+The unencrypted_send function is used to unencrypt the file sent to the server in case the file is in an encrypted 
+format.
+"""
+
+
 def unencrypted_send(event):
-    # Create a dialog box to select the file to be sent to the server unencrypted.
-    filename = filedialog.askopenfilename(
-        initialdir="C:/Users/Desktop/",
+    filename = filedialog.askopenfilename(  # A dialog box is created to select the file to be sent
+                                            # to the server unencrypted.
+        initialdir="C:/Users/Desktop/",  # The location of the file.
         title="Open File to Transfer",
     )
 
-    # Getting the filesize. Useful if we should want to create progress bars.
-    filesize = os.path.getsize(filename)
+    filesize = os.path.getsize(filename)  # Getting the file size. Useful if we should want to create progress bars.
 
-    # Asking the client to send the file name and filesize to the server.
-    client_socket.send(f"{filename}<SEPARATOR>{filesize}".encode())
+    client_socket.send(f"{filename}<SEPARATOR>{filesize}".encode())  # Asking the client to send the file name
+                                                                     # and file size to the server.
 
-    # Here we are copying the contents of the file
-    # Split into smaller pieces that will be transferred to the server.
+"""
+Here we are copying the contents of the file and splitting it into smaller pieces that will be transferred 
+to the server.
+"""
     f = open(filename, 'rb')
     chunk_of_data = f.read(4096)
     while (chunk_of_data):
@@ -68,9 +81,13 @@ def unencrypted_send(event):
 # Finally, we use the client connection to the server to send the file.
 
 
-# Here we define a function that generates a key and writes it to a file
+""" 
+To encrypt the file, a write_key function is defined which generates a symmetric authenticated key and writes it 
+to a file.
+"""
+
 def write_key(event):
-    key = Fernet.generate_key()  # generate a symmetric authenticated key
+    key = Fernet.generate_key()  # Generate a symmetric authenticated key
     with open("key.key", 'wb') as key_file:  # opens a file key.key
         key_file.write(key)  # write the Fernet key to the file
 
@@ -109,7 +126,7 @@ def encrypted_send(event):
     with open(filename, "wb") as file:
         file.write(encrypted_data)
 
-    # Asking the client to send the file name and filesize to the server.
+    # Asking the client to send the file name and file size to the server.
     client_socket.send(f"{filename}<SEPARATOR>{filesize}".encode())
 
     # Here we are copying the contents of the file
@@ -177,7 +194,20 @@ def dict_to_xml(event):
     with open("data_file_xml.xml", "w") as write_file:  # creating a file with xml extension that can be written
         write_file.write(xml_decode)
 
-
+"""
+The below section is unit tests to test smaller sections of a few parts of the code. Unit test needs to be run before 
+the code is run to make sure there are no error in the important parts tested. Below are the tests with explanation:
+ test1: the connection from the client to the server is made using assertTrue.
+ test2: the encryption function encrypts the file. This is done by comparing the file with the data and the encrypted 
+        data. Using the assertNotEqual, if the two are not the same therefore the encryption is not working, otherwise it is.
+ test3: the JSON outcome is in JSON format. The expected correct outcome is compared with the file created using 
+        assertEqual. If the two match, then the test passes and shows that the JSON function works.
+ test4: the XML outcome is in XML format. The expected correct outcome is compared with the file created using 
+        assertEqual. If the two match, then the test passes and shows that the XML function works.
+ test5: the binary outcome is in binary format. The expected correct outcome is compared with the file created using 
+        assertEqual. If the two match, then the test passes and shows that the binary function works.
+ test6: the connection closes using try except. AssertTrue is used to check if the try or the except is happening.
+"""
 class UnitTesting(unittest.TestCase):
 
     def test1_connection(self):
@@ -212,8 +242,9 @@ class UnitTesting(unittest.TestCase):
         with open("UnitTestData.csv", 'r') as inputfile:
             reader = csv.reader(inputfile)
             dict_from_csv = {rows[0]: rows[1] for rows in reader}
-            known_outcome = '''{
-                 "\u00ef\u00bb\u00bfOrder ID\": \"Customer Name\",
+            # Only the first 4 rows of the original file are used for the known_outcome for simplicity reason.
+            known_outcome = '''{ 
+                 "\u00ef\u00bb\u00bfOrder ID\": \"Customer Name\", 
                  "CA-2016-152156\": \"Claire Gute\",
                  "US-2015-108966\": \"Sean O'Donnell\",
                  "CA-2016-138688\": \"Darrin Van Huff\"
@@ -228,6 +259,7 @@ class UnitTesting(unittest.TestCase):
             dict_from_csv = {rows[0]: rows[1] for rows in reader}
             xml_data = dicttoxml(dict_from_csv)
             xml_decode = xml_data.decode()
+            # Only the first 4 rows of the original file are used for the known_outcome for simplicity reason.
             known_outcome = '<?xml version="1.0" encoding="UTF-8" ?><root><key name="Order ID" type="str">Customer ' \
                             'Name</key><CA-2016-152156 type="str">Claire Gute</CA-2016-152156><US-2015-108966 ' \
                             'type="str">Sean O&apos;Donnell</US-2015-108966><CA-2016-138688 type="str">Darrin ' \
@@ -240,6 +272,7 @@ class UnitTesting(unittest.TestCase):
         with open("UnitTestData.csv", 'r') as inputfile:
             reader = csv.reader(inputfile)
             dict_from_csv = {rows[0]: rows[1] for rows in reader}
+            # Only the first 4 rows of the original file are used for the known_outcome for simplicity reason.
             known_outcome = b"\x80\x04\x95\x8a\x00\x00\x00\x00\x00\x00\x00}\x94(\x8c\x0e\xc3\xaf\xc2\xbb" \
                             b"\xc2\xbfOrder ID\x94\x8c\rCustomer Name\x94\x8c\x0eCA-2016-152156\x94" \
                             b"\x8c\x0bClaire Gute\x94\x8c\x0eUS-2015-108966\x94\x8c\x0eSean O'Donnell\x94\x8c" \
@@ -252,13 +285,13 @@ class UnitTesting(unittest.TestCase):
         try:
             client_socket.close()
             connection = True
-        except Exception as e:
+        except Exception as e: # e is the error message that could occur in the try block
             connection = False
         self.assertTrue(connection, "The connection closing did not work!")
         print("Connection closing test passed!")
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': # The main with the unittest refers back to the class that is in the top level.
     unittest.main()
 
 # We are creating a GUI to access our client called 'Client Interface'
