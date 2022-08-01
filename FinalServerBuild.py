@@ -1,16 +1,26 @@
-# Import library for building a TCP server-client
-import socket
-# Import library to work with directories and files
-import os
+"""
+The following libraries have comments besides them that explains why they are imported.
+"""
+
+import socket  # Import library for building a TCP server-client
+
+import os  # Import library to work with directories and files
+
 # Import libraries to build GUI 
 import tkinter as tk
 from tkinter import *
 from tkinter import filedialog
-# Import library for encryption and decryption of files. 
-from cryptography.fernet import Fernet
-import unittest
-from os.path import exists
 
+from cryptography.fernet import Fernet  # Import library for encryption and decryption of files.
+
+import unittest  # Import library to run unit test for parts of the code.
+from os.path import exists  # Import library to work with directories and files (Used in the unit test)
+
+""" 
+A socket with a defined host and port is created to make a connection with the client. The host is defined as the 
+local host and the port is given a port number of 65444 so it is a private port. A function is then defined to connect 
+the server socket to the host and port.
+"""
 # Creating a socket that will create a server and help connect to the client.
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -161,6 +171,20 @@ def print_to_screen(event):
     ws.mainloop()
 
 
+"""
+The below section is unit tests to test smaller sections of a few parts of the code. Unit test needs to be run before 
+the code is run to make sure there are no error in the important parts tested. Below are the tests with explanation:
+ test1: the server starts up using exception handling since it is a crucial step to make sure the server starts. 
+        To ensure that the test runs it had to have an external server; a separate server is created. This conflicts 
+        with the original server. Therefore, to test whether the startup works, the original server would not work. 
+        To use the original server, test1 will have to be changed into a comment to avoid this error. 
+ test2: the decryption function decrypts the file. This is done by comparing the file with the data and the decrypted 
+        data. Using the assertNotEqual, if the two are not the same therefore the encryption is not working, 
+        otherwise it is.
+ test3: the Output File exists as expected. AsserTrue is used to check whether the file is created or not.
+"""
+
+
 class UnitTesting(unittest.TestCase):
 
     def test1_server_startup(self):
@@ -169,7 +193,7 @@ class UnitTesting(unittest.TestCase):
             test_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             test_socket.bind((HOST, PORT))
             connection = True
-        except Exception as e:
+        except Exception as e:  # e is the error message that could occur in the try block
             connection = False
         self.assertTrue(connection, "Server did not start up!")
         print("Server starts up test passed!")
@@ -209,7 +233,7 @@ class UnitTesting(unittest.TestCase):
         print("Output file test passed!")
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # The main with the unittest refers back to the class that is in the top level.
     unittest.main()
 
 # Opening the main server window that will be used as an interface
